@@ -59,7 +59,7 @@ describe("socket.io", () => {
             if (err) return done(err);
             expect(res.headers["content-type"]).to.be("application/javascript");
             expect(res.headers.etag).to.be('"' + clientVersion + '"');
-            expect(res.headers["x-sourcemap"]).to.be(filename + ".map");
+            expect(res.headers["x-sourcemap"]).to.be(undefined);
             expect(res.text).to.match(/engine\.io/);
             expect(res.status).to.be(200);
             done();
@@ -836,6 +836,27 @@ describe("socket.io", () => {
     });
 
     it("should exclude a specific socket when emitting", (done) => {
+      const srv = createServer();
+      const io = new Server(srv);
+
+      srv.listen(() => {
+        const socket1 = client(srv, "/");
+        const socket2 = client(srv, "/");
+
+        socket2.on("a", () => {
+          done(new Error("should not happen"));
+        });
+        socket1.on("a", () => {
+          done();
+        });
+
+        socket2.on("connect", () => {
+          io.except(socket2.id).emit("a");
+        });
+      });
+    });
+
+    it("should exclude a specific socket when emitting (in a namespace)", (done) => {
       const srv = createServer();
       const sio = new Server(srv);
 

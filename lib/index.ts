@@ -201,10 +201,8 @@ export class Server<
   /**
    * @private
    */
-  _nsps: Map<
-    string,
-    Namespace<ListenEvents, EmitEvents, ServerSideEvents>
-  > = new Map();
+  _nsps: Map<string, Namespace<ListenEvents, EmitEvents, ServerSideEvents>> =
+    new Map();
   private parentNsps: Map<
     ParentNspNameMatchFn,
     ParentNamespace<ListenEvents, EmitEvents, ServerSideEvents>
@@ -517,9 +515,6 @@ export class Server<
     );
     res.setHeader("ETag", expectedEtag);
 
-    if (!isMap) {
-      res.setHeader("X-SourceMap", filename.substring(1) + ".map");
-    }
     Server.sendFile(filename, req, res);
   }
 
@@ -705,11 +700,8 @@ export class Server<
    * @return self
    * @public
    */
-  public except(
-    name: Room | Room[]
-  ): Server<ListenEvents, EmitEvents, ServerSideEvents> {
-    this.sockets.except(name);
-    return this;
+  public except(name: Room | Room[]): BroadcastOperator<EmitEvents> {
+    return this.sockets.except(name);
   }
 
   /**
